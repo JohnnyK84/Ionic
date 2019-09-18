@@ -9,7 +9,7 @@
 <ion-content>
   <div class="ion-padding">
     <h1>Bluetoothle Test</h1>  
-    <ion-button (click)="checkBtle()" fill="outline" expand="block">TEST Bluetooth
+    <ion-button (click)="scanBtle()" fill="outline" expand="block">Scan for SNPSHOT by sid
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
     <ion-button (click)="enableBtle()" fill="outline" expand="block">Enable Bluetooth
@@ -18,8 +18,11 @@
     <ion-button (click)="disableBtle()" fill="outline" expand="block">Disable Bluetooth
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
-    <ion-button (click)="adaptInfo()" fill="outline" expand="block">Scan
+    <ion-button (click)="adaptInfo()" fill="outline" expand="block">Adapter Info
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
+    <ion-button (click)="requestPermission()" fill="outline" expand="block">Request Android Permissions
+      <ion-icon class="" name="bluetooth"></ion-icon>
+    </ion-button>    
   </div>
 </ion-content>
