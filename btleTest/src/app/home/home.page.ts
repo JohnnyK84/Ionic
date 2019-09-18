@@ -36,5 +36,5 @@ export class HomePage {
   scanBtle() {
     //this.bluetoothle.disable();
   }
-
+ 
 }
