@@ -24,5 +24,17 @@ export class HomePage {
     
   
   checkBtle() {}
-    
+  
+  enableBtle() {
+    this.bluetoothle.enable();
+  }
+
+  disableBtle() {
+    this.bluetoothle.disable();
+  }
+
+  scanBtle() {
+    //this.bluetoothle.disable();
+  }
+
 }
