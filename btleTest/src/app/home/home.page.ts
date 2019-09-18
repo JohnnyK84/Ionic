@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
+import { BluetoothLE, AdapterInfo } from '@ionic-native/bluetooth-le/ngx';
 import { CheckboxControlValueAccessor } from '@angular/forms';
 
 @Component({
@@ -9,9 +9,9 @@ import { CheckboxControlValueAccessor } from '@angular/forms';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  public ainfo: AdapterInfo;
 
-  constructor(public bluetoothle: BluetoothLE, public plt: Platform) { 
-
+  constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
     this.plt.ready().then((readySource) => {
 
       console.log('Platform ready from', readySource);
@@ -22,9 +22,8 @@ export class HomePage {
     });
   }
     
-  
   checkBtle() {}
-  
+
   enableBtle() {
     this.bluetoothle.enable();
   }
@@ -33,8 +32,11 @@ export class HomePage {
     this.bluetoothle.disable();
   }
 
-  scanBtle() {
-    //this.bluetoothle.disable();
+  adaptInfo() {
+    this.bluetoothle.getAdapterInfo().then(ainfo => {
+      console.log(ainfo);
+    });
+    
   }
  
 }
