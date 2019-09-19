@@ -22,8 +22,7 @@ export class HomePage {
     });
   }
 
-  // scan for device by service id  
-
+  // scan for device by service id
   scanBtle() {
     // params to scan for(service ID to filter out other devices)
     const params = {
@@ -36,13 +35,15 @@ export class HomePage {
     // start scan using params above
     this.bluetoothle.startScan(params).subscribe(scanstatus => {
       console.log(scanstatus);
-      // set timeout for scan
+      // set timeout for scan to stop after 3 seconds
       setTimeout(() => {
+        // get info of scanned device and convert
         const r = this.bluetoothle.encodedStringToBytes(scanstatus.advertisement.toString());
         console.log(r);
-        this.bluetoothle.stopScan();
+        // attempt to further decode unit8 array..not working properly
         const s = this.bluetoothle.bytesToString(r);
         console.log(s);
+        this.bluetoothle.stopScan();
       }, 3000);
       console.log('end');
     });
@@ -75,6 +76,12 @@ export class HomePage {
     this.bluetoothle.bond(params).subscribe(dinfo => {
       console.log(dinfo);
     });
+  }
+
+  unbond() {
+    const params = {address: 'F8:F0:05:E5:D9:9C'};
+
+    this.bluetoothle.unbond(params);
   }
 
 }
