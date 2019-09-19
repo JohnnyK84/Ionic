@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { BluetoothLE, AdapterInfo, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
+import { BluetoothLE, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
 import { CheckboxControlValueAccessor } from '@angular/forms';
 
 @Component({
@@ -9,7 +9,7 @@ import { CheckboxControlValueAccessor } from '@angular/forms';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  public ainfo: AdapterInfo;
+  public scanstatus: ScanStatus;
 
   constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
     this.plt.ready().then((readySource) => {
@@ -17,31 +17,35 @@ export class HomePage {
       console.log('Platform ready from', readySource);
 
       this.bluetoothle.initialize().subscribe(ble => {
-        console.log('ble', ble.status) // logs 'enabled'
+        console.log('ble', ble.status); // logs 'enabled'
       });
     });
   }
 
-  // scan for device by service id
+  // scan for device by service id  
+
   scanBtle() {
     // params to scan for(service ID to filter out other devices)
     const params = {
       services: [
+        // service id for SNPShot
         '46021000-43AF-49C1-A7BC-CEF71ABD0AD9'
       ]
     };
+
     // start scan using params above
     this.bluetoothle.startScan(params).subscribe(scanstatus => {
       console.log(scanstatus);
+      // set timeout for scan
+      setTimeout(() => {
+        const r = this.bluetoothle.encodedStringToBytes(scanstatus.advertisement.toString());
+        console.log(r);
+        this.bluetoothle.stopScan();
+        const s = this.bluetoothle.bytesToString(r);
+        console.log(s);
+      }, 3000);
+      console.log('end');
     });
-  }
-
-  startScanSuccess(scanstate: ScanStatus) {
-    console.log(scanstate.advertisement);
-    }
-
-  startScanError() {
-    console.log('error');
   }
 
   // request permission from device for location services(needed to allow scanning)
@@ -64,4 +68,13 @@ export class HomePage {
       console.log(ainfo);
     });
   }
+
+  bond() {
+    const params = {address: 'F8:F0:05:E5:D9:9C'};
+
+    this.bluetoothle.bond(params).subscribe(dinfo => {
+      console.log(dinfo);
+    });
+  }
+
 }
