@@ -32,21 +32,22 @@ export class HomePage {
       ]
     };
 
-    // start scan using params above
+    // set timeout for scan to stop after 3 seconds
+
+      // start scan using params above
     this.bluetoothle.startScan(params).subscribe(scanstatus => {
       console.log(scanstatus);
-      // set timeout for scan to stop after 3 seconds
+      // get info of scanned device and convert
       setTimeout(() => {
-        // get info of scanned device and convert
-        const r = this.bluetoothle.encodedStringToBytes(scanstatus.advertisement.toString());
-        console.log(r);
-        // attempt to further decode unit8 array..not working properly
-        const s = this.bluetoothle.bytesToString(r);
-        console.log(s);
+        const unit8arr = this.bluetoothle.encodedStringToBytes(scanstatus.advertisement.toString());
+        console.log(unit8arr);
+        // attempt to decode unit8 array..not working properly
+        const bts = this.bluetoothle.bytesToString(unit8arr);
+        console.log(bts);
         this.bluetoothle.stopScan();
-      }, 3000);
-      console.log('end');
-    });
+        console.log('end');
+        }, 3000);
+      });
   }
 
   // request permission from device for location services(needed to allow scanning)
@@ -84,4 +85,80 @@ export class HomePage {
     this.bluetoothle.unbond(params);
   }
 
+  readChar() {
+    let result = '';
+
+    const params = {
+      address: 'F8:F0:05:E5:D9:9C',
+      service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
+      characteristic: '66021001-43AF-49C1-A7BC-CEF71ABD0AD9'
+    };
+    this.bluetoothle.read(params).then(response => {
+      console.log(response);
+      result = response.value;
+      console.log(result);
+      const unit8arr = this.bluetoothle.encodedStringToBytes(result);
+      console.log(unit8arr);
+    });
+  }
+
+  async connectBtle() {
+    const address = {address: 'F8:F0:05:E5:D9:9C'};
+
+    this.bluetoothle.connect(address).subscribe(result => {
+    console.log(result);
+  });
+  }
+
+  async reconnect() {
+    const address = {address: 'F8:F0:05:E5:D9:9C'};
+
+    this.bluetoothle.reconnect(address).subscribe(result => {
+      console.log(result);
+    });
+  }
+
+  // method to discover device services
+  discover() {
+    const address = {address: 'F8:F0:05:E5:D9:9C'};
+    this.bluetoothle.discover(address).then(device => {
+      console.log(device);
+    });
+  }
+
+  // Scan ID
+  scanTag() {
+    const bytes = this.bluetoothle.stringToBytes('0x01');
+    const encodedString = this.bluetoothle.bytesToEncodedString(bytes);
+
+    const params = {
+      address: 'F8:F0:05:E5:D9:9C',
+      service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
+      characteristic: '66021004-43AF-49C1-A7BC-CEF71ABD0AD9',
+      value: encodedString,
+      type: 'noResponse'
+    };
+
+    this.bluetoothle.write(params).then(response => {
+      console.log(response);
+    });
+  }
+
+  // display Scanned Id
+  displayId() {
+    const bytes = this.bluetoothle.stringToBytes('0x03');
+    const encodedString = this.bluetoothle.bytesToEncodedString(bytes);
+
+    const params = {
+      address: 'F8:F0:05:E5:D9:9C',
+      service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
+      characteristic: '66021004-43AF-49C1-A7BC-CEF71ABD0AD9',
+      value: encodedString,
+      type: 'noResponse'
+    };
+
+    this.bluetoothle.write(params).then(response => {
+      console.log(response);
+    });
+  }
 }
