@@ -8,6 +8,7 @@ import { CheckboxControlValueAccessor } from '@angular/forms';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
+
 export class HomePage {
   public scanstatus: ScanStatus;
 
@@ -18,6 +19,8 @@ export class HomePage {
 
       this.bluetoothle.initialize().subscribe(ble => {
         console.log('ble', ble.status); // logs 'enabled'
+        // connect to device reader
+        this.connectBtle();
       });
     });
   }
@@ -32,9 +35,7 @@ export class HomePage {
       ]
     };
 
-    // set timeout for scan to stop after 3 seconds
-
-      // start scan using params above
+    // start scan using params above
     this.bluetoothle.startScan(params).subscribe(scanstatus => {
       console.log(scanstatus);
       // get info of scanned device and convert
@@ -57,20 +58,24 @@ export class HomePage {
     });
   }
 
+  // enable bluetooth on the device
   enableBtle() {
     this.bluetoothle.enable();
   }
 
+  // disable bluetooth on the device
   disableBtle() {
     this.bluetoothle.disable();
   }
 
+  // display device information
   adaptInfo() {
     this.bluetoothle.getAdapterInfo().then(ainfo => {
       console.log(ainfo);
     });
   }
 
+  // bond to SNPShot
   bond() {
     const params = {address: 'F8:F0:05:E5:D9:9C'};
 
@@ -79,37 +84,25 @@ export class HomePage {
     });
   }
 
+  // unbond SNPShot
   unbond() {
     const params = {address: 'F8:F0:05:E5:D9:9C'};
 
     this.bluetoothle.unbond(params);
   }
 
-  readChar() {
-    let result = '';
-
-    const params = {
-      address: 'F8:F0:05:E5:D9:9C',
-      service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
-      characteristic: '66021001-43AF-49C1-A7BC-CEF71ABD0AD9'
-    };
-    this.bluetoothle.read(params).then(response => {
-      console.log(response);
-      result = response.value;
-      console.log(result);
-      const unit8arr = this.bluetoothle.encodedStringToBytes(result);
-      console.log(unit8arr);
-    });
-  }
-
+  // connect to SNPShot by address
   async connectBtle() {
     const address = {address: 'F8:F0:05:E5:D9:9C'};
 
     this.bluetoothle.connect(address).subscribe(result => {
     console.log(result);
-  });
+    // discover services
+    this.discover();
+    });
   }
 
+  // reconnect to SNPShot using address (needed after having been already connected)
   async reconnect() {
     const address = {address: 'F8:F0:05:E5:D9:9C'};
 
@@ -118,47 +111,47 @@ export class HomePage {
     });
   }
 
-  // method to discover device services
+  // method to discover device services (needed before you can access the devices services)
   discover() {
-    const address = {address: 'F8:F0:05:E5:D9:9C'};
+    const address = { address: 'F8:F0:05:E5:D9:9C' };
     this.bluetoothle.discover(address).then(device => {
       console.log(device);
     });
   }
 
-  // Scan ID
-  scanTag() {
-    const bytes = this.bluetoothle.stringToBytes('0x01');
-    const encodedString = this.bluetoothle.bytesToEncodedString(bytes);
-
+  // Read payload 1 from SNPShot
+  readSnpshot() {
     const params = {
       address: 'F8:F0:05:E5:D9:9C',
       service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
-      characteristic: '66021004-43AF-49C1-A7BC-CEF71ABD0AD9',
-      value: encodedString,
-      type: 'noResponse'
+      characteristic: '66021001-43AF-49C1-A7BC-CEF71ABD0AD9',
     };
 
-    this.bluetoothle.write(params).then(response => {
+    this.bluetoothle.read(params).then(response => {
       console.log(response);
+      const stringToBytes = this.bluetoothle.encodedStringToBytes(response.value);
+      console.log(stringToBytes);
     });
   }
 
-  // display Scanned Id
-  displayId() {
-    const bytes = this.bluetoothle.stringToBytes('0x03');
-    const encodedString = this.bluetoothle.bytesToEncodedString(bytes);
+  // scan tag
+  scanTag() {
+    // convert string to byte aray as value in params must be set as encoded bytes
+    const bytes = new Uint8Array([0x01]); // instruction to tell device to read tag
+    // Enocde the byte array to base64 encoded string of bytes
+    const encoded = this.bluetoothle.bytesToEncodedString(bytes);
 
     const params = {
       address: 'F8:F0:05:E5:D9:9C',
       service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
       characteristic: '66021004-43AF-49C1-A7BC-CEF71ABD0AD9',
-      value: encodedString,
-      type: 'noResponse'
+      value: encoded
     };
 
     this.bluetoothle.write(params).then(response => {
       console.log(response);
+      const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(response.value);
+      console.log(bytes2);
     });
   }
 }
