@@ -8,7 +8,7 @@
 
 <ion-content>
   <div class="ion-padding">
-    <h1>Bluetoothle Test</h1>      
+    <h1>Bluetoothle Test</h1> 
     <ion-button (click)="connectBtle()" fill="outline" expand="block">Connect SNPShot
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
@@ -17,11 +17,14 @@
     </ion-button>
     <ion-button (click)="discover()" fill="outline" expand="block">Discover services
       <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>
-    <ion-button (click)="readSnpshot()" fill="outline" expand="block">Get Payload 1
+    </ion-button>    
+    <ion-button (click)="scanTag()" fill="outline" expand="block">Scan RFID Tag
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
-    <ion-button (click)="scanTag()" fill="outline" expand="block">Scan Tag
+    <ion-button (click)="getPayload1()" fill="outline" expand="block">Get Payload 1
+      <ion-icon class="" name="bluetooth"></ion-icon>
+    </ion-button>
+    <ion-button (click)="getPayload2()" fill="outline" expand="block">Get Payload 2
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
     <ion-button (click)="scanBtle()" fill="outline" expand="block">Scan for SNPSHOT by sid
@@ -44,6 +47,6 @@
     </ion-button>
     <ion-button (click)="unbond()" fill="outline" expand="block">Unbond
       <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>        
+    </ion-button>           
   </div>
 </ion-content>
