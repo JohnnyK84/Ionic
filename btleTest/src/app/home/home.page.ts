@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { BluetoothLE, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
+import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
 import { CheckboxControlValueAccessor } from '@angular/forms';
 import { DataParser } from './dataParseMethods';
 
@@ -11,7 +11,7 @@ import { DataParser } from './dataParseMethods';
 })
 
 export class HomePage {
-  public scanstatus: ScanStatus;
+  public scannedTags: Uint8Array[] = [];
 
   constructor(
     public bluetoothle: BluetoothLE,
@@ -132,10 +132,11 @@ export class HomePage {
   // scan RFID tag
   scanTag() {
     // convert string to byte aray as value in params must be set as encoded byte array
-    const bytes = new Uint8Array([0x01]); // instruction to tell device to read tag
+    const instruct = new Uint8Array([0x01]); // instruction to tell device to read tag
     // Enocde the byte array to base64 encoded string of bytes
-    const encoded = this.bluetoothle.bytesToEncodedString(bytes);
+    const encoded = this.bluetoothle.bytesToEncodedString(instruct);
 
+    // Set params of write instruction
     const params = {
       address: 'F8:F0:05:E5:D9:9C',
       service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
@@ -143,9 +144,13 @@ export class HomePage {
       value: encoded
     };
 
-    this.bluetoothle.write(params).then(response => {
+    // write instruction to SNPShot device and return response
+    this.bluetoothle.write(params).then(response =>  {
       console.log(response);
+
+      // decode response value to Unit8Array
       const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(response.value);
+
       console.log(bytes2);
     });
   }
@@ -160,9 +165,20 @@ export class HomePage {
 
     this.bluetoothle.read(params).then(response => {
       console.log(response);
-      const stringToBytes = this.bluetoothle.encodedStringToBytes(response.value);
+      // decode response.value into Unit8Array of bytes
+      const stringToBytes: Uint8Array = this.bluetoothle.encodedStringToBytes(response.value);
       console.log(stringToBytes);
+
+      console.log(this.scannedTags.includes(stringToBytes));
+
+      if ( this.scannedTags.includes(stringToBytes) ) {
+        alert('Tag Already scanned');
+        return;
+      }
+      this.scannedTags.push(stringToBytes);
       this.dataParser.getCountryCode(stringToBytes);
+      console.log(this.scannedTags);
+      // this.dataParser.getNationalCode();
     });
   }
 

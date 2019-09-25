@@ -20,7 +20,7 @@ import { DataParser } from './home/dataParseMethods';
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     BluetoothLE,
-    DataParser
+    DataParser,
   ],
   bootstrap: [AppComponent]
 })

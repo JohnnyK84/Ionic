@@ -27,7 +27,13 @@ export class DataParser {
         alert('Scanned tag country code: ' + this.CountryCode);
     }
 
-    getNationalCode() {
-        
-    }
+    /*getNationalCode() {
+        const parser = new binary_parser().endianess("little").uint32("test");
+
+        console.log(parser);
+
+        const buff = Buffer.from("[81,229,16,1,0]", "binary")
+
+        console.log(parser.parse(buff));
+    }*/
 }
