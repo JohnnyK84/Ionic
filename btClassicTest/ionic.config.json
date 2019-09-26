@@ -1,0 +1,7 @@
+{
+  "name": "btClassicTest",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}

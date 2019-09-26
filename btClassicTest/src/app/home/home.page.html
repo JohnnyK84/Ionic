@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Bluetooth Classic Testing
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-padding">
+    <h1>Bluetooth Classic</h1>
+    <hr>
+    <ion-button (click)="connectBtClassic()" fill="outline" expand="block">Connect Stick Reader
+      <ion-icon class="" name="bluetooth"></ion-icon>
+    </ion-button>
+    <hr>
+    <hr>
+    <ion-button (click)="readData()" fill="outline" expand="block">Read Data from stick
+      <ion-icon class="" name="bluetooth"></ion-icon>
+    </ion-button>
+    <hr>
+    <hr>
+    <ion-button (click)="scanforDevices()" fill="outline" expand="block">BT Classic Scan
+      <ion-icon class="" name="bluetooth"></ion-icon>
+    </ion-button>
+    <hr>
+  </div>
+</ion-content>
