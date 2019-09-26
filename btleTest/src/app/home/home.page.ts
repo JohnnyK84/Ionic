@@ -11,6 +11,7 @@ import { DataParser } from './dataParseMethods';
 })
 
 export class HomePage {
+  // array to hold scanned data
   public scannedTags: Uint8Array[] = [];
 
   constructor(
@@ -19,16 +20,14 @@ export class HomePage {
     public dataParser: DataParser
     ) {
       this.plt.ready().then((readySource) => {
-
       console.log('Platform ready from', readySource);
 
       this.bluetoothle.initialize().subscribe(ble => {
+        // if device bluetooth is disabled then enable
         if (ble.status === 'disabled') {
           this.enableBtle();
         }
-
         console.log('ble', ble.status); // logs 'enabled'
-
         // connect to device reader
         this.connectBtle();
       });
@@ -85,7 +84,7 @@ export class HomePage {
     });
   }
 
-  // bond to SNPShot
+  // bond to SNPShot using service ID
   bond() {
     const params = {address: 'F8:F0:05:E5:D9:9C'};
 
@@ -107,7 +106,7 @@ export class HomePage {
 
     this.bluetoothle.connect(address).subscribe(result => {
     console.log(result);
-    // discover services
+    // discover services..must be discovered before services can be used
     this.discover();
     });
   }
@@ -130,7 +129,7 @@ export class HomePage {
   }
 
   // scan RFID tag
-  scanTag() {
+  async scanTag() {
     // convert string to byte aray as value in params must be set as encoded byte array
     const instruct = new Uint8Array([0x01]); // instruction to tell device to read tag
     // Enocde the byte array to base64 encoded string of bytes
@@ -144,15 +143,23 @@ export class HomePage {
       value: encoded
     };
 
+    // write instruction to SNPShot device and pass in instruction params
+    this.writeInstruct(params);
+
+    // after 3.5 seconds show last scanned tag to user
+    setTimeout(() => {
+      this.getPayload1();
+    }, 3500);
+  }
+
+  // write method for writing instructions or data to SNPShot
+  async writeInstruct(params) {
+    const response = await this.bluetoothle.write(params);
     // write instruction to SNPShot device and return response
-    this.bluetoothle.write(params).then(response =>  {
-      console.log(response);
-
-      // decode response value to Unit8Array
-      const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(response.value);
-
-      console.log(bytes2);
-    });
+    console.log(await response);
+    // decode response value to Unit8Array
+    const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(await response.value);
+    console.log(bytes2);
   }
 
   // Read payload 1 from SNPShot
@@ -169,20 +176,27 @@ export class HomePage {
       const stringToBytes: Uint8Array = this.bluetoothle.encodedStringToBytes(response.value);
       console.log(stringToBytes);
 
-      console.log(this.scannedTags.includes(stringToBytes));
+      // set buffer for data view
+      const buff = stringToBytes.buffer;
+      // set view for Country Code
+      const viewCountryCode = new DataView(buff);
+      const viewNationalCode = new DataView(buff);
 
+      alert('Country Code is: ' + viewCountryCode.getUint16(1, true));
+      alert('National Code is:  ' + viewNationalCode.getUint32(3, true));
+
+      console.log(this.scannedTags.includes(stringToBytes));
+      // check if data is already in array before pushing to it
       if ( this.scannedTags.includes(stringToBytes) ) {
         alert('Tag Already scanned');
         return;
       }
       this.scannedTags.push(stringToBytes);
-      this.dataParser.getCountryCode(stringToBytes);
       console.log(this.scannedTags);
-      // this.dataParser.getNationalCode();
     });
   }
 
-  // Read payload 2 from SNPShot
+  // Read payload 2 from SNPShot // no data here as no cartridges being read
   getPayload2() {
     const params = {
       address: 'F8:F0:05:E5:D9:9C',
@@ -197,6 +211,7 @@ export class HomePage {
     });
   }
 
+  // method not being used
   displayAnimalId() {
     // convert string to byte aray as value in params must be set as encoded byte array
     const bytes = new Uint8Array([0x03]); // instruction to tell device to read tag
