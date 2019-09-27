@@ -9,7 +9,8 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
-import { DataParser } from './home/dataParseMethods';
+import { BtleServiceService } from './home/btle-service.service';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,7 +21,7 @@ import { DataParser } from './home/dataParseMethods';
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     BluetoothLE,
-    DataParser,
+    BtleServiceService
   ],
   bootstrap: [AppComponent]
 })

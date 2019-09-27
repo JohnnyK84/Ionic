@@ -33,6 +33,28 @@
     <ion-button (click)="getPayload2()" fill="outline" expand="block">Get Payload 2
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
+
+  
+  <ion-grid> 
+    <h3 class="ion-text-center">Scanned Tags:</h3> 
+    <ion-row>
+      <ion-col>
+        <p>Country Code:</p>
+      </ion-col>
+      <ion-col>
+        <p>National Code:</p>
+      </ion-col>
+    </ion-row>          
+      <ion-row *ngFor="let tag of rfidTags">
+        <ion-col>
+          {{  tag.countryCode  }}
+        </ion-col>
+        <ion-col>
+          {{  tag.nationalCode  }}
+        </ion-col>
+      </ion-row>
+  </ion-grid>
+
     
     <!-- these buttons not being used, for testing purposed only
     <ion-button (click)="scanBtle()" fill="outline" expand="block">Scan for SNPSHOT by sid

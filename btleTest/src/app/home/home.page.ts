@@ -2,22 +2,22 @@ import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
 import { CheckboxControlValueAccessor } from '@angular/forms';
-import { DataParser } from './dataParseMethods';
+import { RfidTag } from '../models/rfidTag';
+import { BtleServiceService } from './btle-service.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-
 export class HomePage {
-  // array to hold scanned data
-  public scannedTags: Uint8Array[] = [];
+  // get scanned data array from service
+  rfidTags = this._btleSerivce.getTags();
 
   constructor(
     public bluetoothle: BluetoothLE,
     public plt: Platform,
-    public dataParser: DataParser
+    private _btleSerivce: BtleServiceService
     ) {
       this.plt.ready().then((readySource) => {
       console.log('Platform ready from', readySource);
@@ -60,6 +60,17 @@ export class HomePage {
       });
   }
 
+  // connect to SNPShot by address
+  async connectBtle() {
+    const address = {address: 'F8:F0:05:E5:D9:9C'};
+
+    this.bluetoothle.connect(address).subscribe(result => {
+    console.log(result);
+    // discover services..must be discovered before services can be used
+    this.discover();
+    });
+  }
+
   // request permission from device for location services(needed to allow scanning)
   requestPermission() {
     this.bluetoothle.requestPermission().then(permission => {
@@ -100,17 +111,6 @@ export class HomePage {
     this.bluetoothle.unbond(params);
   }
 
-  // connect to SNPShot by address
-  async connectBtle() {
-    const address = {address: 'F8:F0:05:E5:D9:9C'};
-
-    this.bluetoothle.connect(address).subscribe(result => {
-    console.log(result);
-    // discover services..must be discovered before services can be used
-    this.discover();
-    });
-  }
-
   // reconnect to SNPShot using address (needed after having been already connected)
   async reconnect() {
     const address = {address: 'F8:F0:05:E5:D9:9C'};
@@ -146,10 +146,10 @@ export class HomePage {
     // write instruction to SNPShot device and pass in instruction params
     this.writeInstruct(params);
 
-    // after 3.5 seconds show last scanned tag to user
+    /* after 3.5 seconds show last scanned tag to user
     setTimeout(() => {
       this.getPayload1();
-    }, 3500);
+    }, 3500); */
   }
 
   // write method for writing instructions or data to SNPShot
@@ -164,6 +164,11 @@ export class HomePage {
 
   // Read payload 1 from SNPShot
   getPayload1() {
+    let rfidTag: RfidTag = {
+      countryCode: 0,
+      nationalCode: 0
+    };
+
     const params = {
       address: 'F8:F0:05:E5:D9:9C',
       service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
@@ -171,28 +176,27 @@ export class HomePage {
     };
 
     this.bluetoothle.read(params).then(response => {
-      console.log(response);
+      console.log('Initial Read Response object:\n ' + response);
       // decode response.value into Unit8Array of bytes
       const stringToBytes: Uint8Array = this.bluetoothle.encodedStringToBytes(response.value);
-      console.log(stringToBytes);
+      console.log('Returned value eoncoded to Uin8 Array:\n ' + stringToBytes);
 
       // set buffer for data view
       const buff = stringToBytes.buffer;
-      // set view for Country Code
+      // set views to convert Country code and National code from Uint8 values to required Uin16/Uint32 values
       const viewCountryCode = new DataView(buff);
       const viewNationalCode = new DataView(buff);
 
-      alert('Country Code is: ' + viewCountryCode.getUint16(1, true));
-      alert('National Code is:  ' + viewNationalCode.getUint32(3, true));
+      rfidTag.countryCode =  viewCountryCode.getUint16(1, true);
+      rfidTag.nationalCode = viewNationalCode.getUint32(3, true);
 
-      console.log(this.scannedTags.includes(stringToBytes));
-      // check if data is already in array before pushing to it
-      if ( this.scannedTags.includes(stringToBytes) ) {
-        alert('Tag Already scanned');
-        return;
-      }
-      this.scannedTags.push(stringToBytes);
-      console.log(this.scannedTags);
+      alert('Country Code is: ' + rfidTag.countryCode);
+      alert('National Code is:  ' + rfidTag.nationalCode);
+
+      console.log('RFID Tag Value: ' + rfidTag);
+      // add scanned RFID tag to array
+      this._btleSerivce.addRfidTag(rfidTag);
+      console.log(this.rfidTags);
     });
   }
 
