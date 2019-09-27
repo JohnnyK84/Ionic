@@ -14,8 +14,12 @@ export class HomePage {
 
   // connect to Gallagher Stick Reader
   connectBtClassic() {
-    this.bluetoothSerial.connect("00:07:80:9F:BB:9D").subscribe(response => {
-      console.log(response);
+    this.bluetoothSerial.connect('00:07:80:9F:BB:9D').subscribe(response => {
+      if (response === 'OK') {
+        alert('Connected');
+      }
+    }, error => {
+      alert('Not Connected' + error);
     });
   }
 
@@ -23,7 +27,9 @@ export class HomePage {
   readData() {
     this.bluetoothSerial.read().then(response => {
       console.log(response);
-      alert('Stick Data:\n' + response);
+      // alert('Stick Data:\n' + response);
+      let test = response.toString();
+      console.log('response as string: ' + test);
     });
   }
 
@@ -31,7 +37,28 @@ export class HomePage {
   scanforDevices() {
       this.bluetoothSerial.discoverUnpaired().then(response => {
       console.log(response);
-      // alert(response);
+      alert(response);
+    });
+  }
+
+  // subscribte to continually read from buffer
+  subscribe() {
+    this.bluetoothSerial.subscribe('').subscribe(response => {
+      console.log(response);
+    }, error => {
+      console.log(error);
+    });
+  }
+
+  readUntil() {
+    this.bluetoothSerial.readUntil(',').then(response => {
+      console.log(response);
+    });
+  }
+
+  subscribeRaw() {
+    this.bluetoothSerial.subscribeRawData().subscribe(response => {
+      console.log(response);
     });
   }
 }
