@@ -146,10 +146,10 @@ export class HomePage {
     // write instruction to SNPShot device and pass in instruction params
     this.writeInstruct(params);
 
-    /* after 3.5 seconds show last scanned tag to user
+    // after 3.5 seconds show last scanned tag to user
     setTimeout(() => {
       this.getPayload1();
-    }, 3500); */
+    }, 3500);
   }
 
   // write method for writing instructions or data to SNPShot
