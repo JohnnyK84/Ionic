@@ -41,12 +41,15 @@ export class HomePage {
     });
   }
 
-  // subscribte to continually read from buffer
+  // subscribte to continually read from buffer \n or new line as delimiter
   subscribe() {
-    this.bluetoothSerial.subscribe('').subscribe(response => {
+    this.bluetoothSerial.subscribe('\n').subscribe(response => {
       console.log(response);
+      const responseString = response.toString();
+      alert('Country Code: ' + responseString.substr(2, 3) +
+        '\nNational Code: ' + responseString.substr(5, responseString.length));
     }, error => {
-      console.log(error);
+      console.log('Something went wrong: ' + error);
     });
   }
 
@@ -56,6 +59,8 @@ export class HomePage {
     });
   }
 
+
+  // subscribe to raw data stream (Uint8 array)
   subscribeRaw() {
     this.bluetoothSerial.subscribeRawData().subscribe(response => {
       console.log(response);
