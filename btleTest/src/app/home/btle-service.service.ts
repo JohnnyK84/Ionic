@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { RfidTag } from '../models/rfidTag';
+import { BatchTags } from '../models/batchTags';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,13 @@ export class BtleServiceService {
 
   rfidTags: RfidTag[] = [];
 
+  public scannedTags: BatchTags = {
+     id: 0,
+     tags: this.rfidTags,
+     date: null,
+     location: ''
+  };
+
   constructor() { }
 
   addRfidTag(tag: RfidTag) {
@@ -21,5 +29,9 @@ export class BtleServiceService {
 
   getTags() {
     return this.rfidTags;
+  }
+
+  getBatch() {
+    return this.scannedTags;
   }
 }

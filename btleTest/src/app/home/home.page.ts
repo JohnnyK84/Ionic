@@ -1,33 +1,37 @@
-import { Component } from '@angular/core';
-import { Platform } from '@ionic/angular';
-import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
-import { CheckboxControlValueAccessor } from '@angular/forms';
-import { RfidTag } from '../models/rfidTag';
-import { BtleServiceService } from './btle-service.service';
+import { Component } from "@angular/core";
+import { Platform, ModalController } from "@ionic/angular";
+import { BluetoothLE } from "@ionic-native/bluetooth-le/ngx";
+import { CheckboxControlValueAccessor } from "@angular/forms";
+import { RfidTag } from "../models/rfidTag";
+import { BtleServiceService } from "./btle-service.service";
+import { nextTick } from "q";
+import { CreateBatchComponent } from "./create-batch/create-batch.component";
 
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  selector: "app-home",
+  templateUrl: "home.page.html",
+  styleUrls: ["home.page.scss"]
 })
 export class HomePage {
   // get scanned data array from service
   rfidTags = this._btleSerivce.getTags();
+  batchTags = this._btleSerivce.getBatch();
 
   constructor(
     public bluetoothle: BluetoothLE,
     public plt: Platform,
-    private _btleSerivce: BtleServiceService
-    ) {
-      this.plt.ready().then((readySource) => {
-      console.log('Platform ready from', readySource);
+    private _btleSerivce: BtleServiceService,
+    private _modalCtrl: ModalController
+  ) {
+    this.plt.ready().then(readySource => {
+      console.log("Platform ready from", readySource);
 
       this.bluetoothle.initialize().subscribe(ble => {
         // if device bluetooth is disabled then enable
-        if (ble.status === 'disabled') {
+        if (ble.status === "disabled") {
           this.enableBtle();
         }
-        console.log('ble', ble.status); // logs 'enabled'
+        console.log("ble", ble.status); // logs 'enabled'
         // connect to device reader
         this.connectBtle();
       });
@@ -40,7 +44,7 @@ export class HomePage {
     const params = {
       services: [
         // service id for SNPShot
-        '46021000-43AF-49C1-A7BC-CEF71ABD0AD9'
+        "46021000-43AF-49C1-A7BC-CEF71ABD0AD9"
       ]
     };
 
@@ -49,25 +53,27 @@ export class HomePage {
       console.log(scanstatus);
       // get info of scanned device and convert
       setTimeout(() => {
-        const unit8arr = this.bluetoothle.encodedStringToBytes(scanstatus.advertisement.toString());
+        const unit8arr = this.bluetoothle.encodedStringToBytes(
+          scanstatus.advertisement.toString()
+        );
         console.log(unit8arr);
         // attempt to decode unit8 array..not working properly
         const bts = this.bluetoothle.bytesToString(unit8arr);
         console.log(bts);
         this.bluetoothle.stopScan();
-        console.log('end');
-        }, 3000);
-      });
+        console.log("end");
+      }, 3000);
+    });
   }
 
   // connect to SNPShot by address
   async connectBtle() {
-    const address = {address: 'F8:F0:05:E5:D9:9C'};
+    const address = { address: "F8:F0:05:E5:D9:9C" };
 
     this.bluetoothle.connect(address).subscribe(result => {
-    console.log(result);
-    // discover services..must be discovered before services can be used
-    this.discover();
+      console.log(result);
+      // discover services..must be discovered before services can be used
+      this.discover();
     });
   }
 
@@ -97,7 +103,7 @@ export class HomePage {
 
   // bond to SNPShot using service ID
   bond() {
-    const params = {address: 'F8:F0:05:E5:D9:9C'};
+    const params = { address: "F8:F0:05:E5:D9:9C" };
 
     this.bluetoothle.bond(params).subscribe(dinfo => {
       console.log(dinfo);
@@ -106,14 +112,14 @@ export class HomePage {
 
   // unbond SNPShot
   unbond() {
-    const params = {address: 'F8:F0:05:E5:D9:9C'};
+    const params = { address: "F8:F0:05:E5:D9:9C" };
 
     this.bluetoothle.unbond(params);
   }
 
   // reconnect to SNPShot using address (needed after having been already connected)
   async reconnect() {
-    const address = {address: 'F8:F0:05:E5:D9:9C'};
+    const address = { address: "F8:F0:05:E5:D9:9C" };
 
     this.bluetoothle.reconnect(address).subscribe(result => {
       console.log(result);
@@ -122,7 +128,7 @@ export class HomePage {
 
   // method to discover device services (needed before you can access the devices services)
   discover() {
-    const address = { address: 'F8:F0:05:E5:D9:9C' };
+    const address = { address: "F8:F0:05:E5:D9:9C" };
     this.bluetoothle.discover(address).then(device => {
       console.log(device);
     });
@@ -137,9 +143,9 @@ export class HomePage {
 
     // Set params of write instruction
     const params = {
-      address: 'F8:F0:05:E5:D9:9C',
-      service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
-      characteristic: '66021004-43AF-49C1-A7BC-CEF71ABD0AD9',
+      address: "F8:F0:05:E5:D9:9C",
+      service: "66021000-43AF-49C1-A7BC-CEF71ABD0AD9",
+      characteristic: "66021004-43AF-49C1-A7BC-CEF71ABD0AD9",
       value: encoded
     };
 
@@ -158,7 +164,9 @@ export class HomePage {
     // write instruction to SNPShot device and return response
     console.log(await response);
     // decode response value to Unit8Array
-    const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(await response.value);
+    const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(
+      await response.value
+    );
     console.log(bytes2);
   }
 
@@ -170,16 +178,18 @@ export class HomePage {
     };
 
     const params = {
-      address: 'F8:F0:05:E5:D9:9C',
-      service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
-      characteristic: '66021001-43AF-49C1-A7BC-CEF71ABD0AD9',
+      address: "F8:F0:05:E5:D9:9C",
+      service: "66021000-43AF-49C1-A7BC-CEF71ABD0AD9",
+      characteristic: "66021001-43AF-49C1-A7BC-CEF71ABD0AD9"
     };
 
     this.bluetoothle.read(params).then(response => {
-      console.log('Initial Read Response object:\n ' + response);
+      console.log("Initial Read Response object:\n " + response);
       // decode response.value into Unit8Array of bytes
-      const stringToBytes: Uint8Array = this.bluetoothle.encodedStringToBytes(response.value);
-      console.log('Returned value eoncoded to Uin8 Array:\n ' + stringToBytes);
+      const stringToBytes: Uint8Array = this.bluetoothle.encodedStringToBytes(
+        response.value
+      );
+      console.log("Returned value eoncoded to Uin8 Array:\n " + stringToBytes);
 
       // set buffer for data view
       const buff = stringToBytes.buffer;
@@ -187,13 +197,13 @@ export class HomePage {
       const viewCountryCode = new DataView(buff);
       const viewNationalCode = new DataView(buff);
 
-      rfidTag.countryCode =  viewCountryCode.getUint16(1, true);
+      rfidTag.countryCode = viewCountryCode.getUint16(1, true);
       rfidTag.nationalCode = viewNationalCode.getUint32(3, true);
 
-      alert('Country Code is: ' + rfidTag.countryCode);
-      alert('National Code is:  ' + rfidTag.nationalCode);
+      alert("Country Code is: " + rfidTag.countryCode);
+      alert("National Code is:  " + rfidTag.nationalCode);
 
-      console.log('RFID Tag Value: ' + rfidTag);
+      console.log("RFID Tag Value: " + rfidTag);
       // add scanned RFID tag to array
       this._btleSerivce.addRfidTag(rfidTag);
       console.log(this.rfidTags);
@@ -203,14 +213,16 @@ export class HomePage {
   // Read payload 2 from SNPShot // no data here as no cartridges being read
   getPayload2() {
     const params = {
-      address: 'F8:F0:05:E5:D9:9C',
-      service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
-      characteristic: '66021002-43AF-49C1-A7BC-CEF71ABD0AD9',
+      address: "F8:F0:05:E5:D9:9C",
+      service: "66021000-43AF-49C1-A7BC-CEF71ABD0AD9",
+      characteristic: "66021002-43AF-49C1-A7BC-CEF71ABD0AD9"
     };
 
     this.bluetoothle.read(params).then(response => {
       console.log(response);
-      const stringToBytes = this.bluetoothle.encodedStringToBytes(response.value);
+      const stringToBytes = this.bluetoothle.encodedStringToBytes(
+        response.value
+      );
       console.log(stringToBytes);
     });
   }
@@ -223,16 +235,33 @@ export class HomePage {
     const encoded = this.bluetoothle.bytesToEncodedString(bytes);
 
     const params = {
-      address: 'F8:F0:05:E5:D9:9C',
-      service: '66021000-43AF-49C1-A7BC-CEF71ABD0AD9',
-      characteristic: '66021004-43AF-49C1-A7BC-CEF71ABD0AD9',
+      address: "F8:F0:05:E5:D9:9C",
+      service: "66021000-43AF-49C1-A7BC-CEF71ABD0AD9",
+      characteristic: "66021004-43AF-49C1-A7BC-CEF71ABD0AD9",
       value: encoded
     };
 
     this.bluetoothle.write(params).then(response => {
       console.log(response);
-      const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(response.value);
+      const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(
+        response.value
+      );
       console.log(bytes2);
     });
+  }
+
+  createBatch() {
+    this._modalCtrl
+      .create({ component: CreateBatchComponent })
+      .then(modalEl => {
+        modalEl.present();
+        return modalEl.onDidDismiss();
+      })
+      .then(resultData => {
+        console.log(resultData.data, resultData.role);
+        if (resultData.role === "Confirm") {
+          console.log("Batch Created!");
+        }
+      });
   }
 }

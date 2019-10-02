@@ -34,9 +34,15 @@
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
 
+    <ion-button (click)="createBatch()">
+      Create New Batch
+    </ion-button>
+
+
   
   <ion-grid> 
-    <h3 class="ion-text-center">Scanned Tags:</h3> 
+    <h3 class="ion-text-center">Scanned Tags: Batch {{  batchTags.id  }}</h3> 
+    <h3> Batch Location: {{  batchTags.location  }}, Batch Date: {{  batchTags.date  }}</h3>
     <ion-row>
       <ion-col>
         <p>Country Code:</p>
