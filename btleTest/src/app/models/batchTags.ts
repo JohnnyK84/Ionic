@@ -1,8 +1,11 @@
-import { RfidTag } from './rfidTag';
+import { RfidTag } from "./rfidTag";
 
 export class BatchTags {
-    id: number;
-    tags: RfidTag[];
-    date: Date;
-    location: string;
+  constructor(
+    public id: number,
+    // public tags: RfidTag[];
+    // public date: Date;
+    public location: string,
+    public description: string
+  ) {}
 }

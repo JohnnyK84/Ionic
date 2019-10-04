@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
-import { RfidTag } from '../models/rfidTag';
-import { BatchTags } from '../models/batchTags';
+import { Injectable } from "@angular/core";
+import { RfidTag } from "../models/rfidTag";
+import { BatchTags } from "../models/batchTags";
+import { ModalController } from "@ionic/angular";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class BtleServiceService {
-
   public rfidTag: RfidTag = {
     countryCode: 0,
     nationalCode: 0
@@ -15,13 +15,14 @@ export class BtleServiceService {
   rfidTags: RfidTag[] = [];
 
   public scannedTags: BatchTags = {
-     id: 0,
-     tags: this.rfidTags,
-     date: null,
-     location: ''
+    id: 0,
+    // tags: this.rfidTags,
+    //date: null,
+    location: "",
+    description: ""
   };
 
-  constructor() { }
+  constructor(private _mdlCtrl: ModalController) {}
 
   addRfidTag(tag: RfidTag) {
     this.rfidTags.push(tag);
@@ -33,5 +34,12 @@ export class BtleServiceService {
 
   getBatch() {
     return this.scannedTags;
+  }
+
+  newBatch(id: number, location: string, description: string) {
+    const newBatch = new BatchTags(id, location, description);
+    console.log(newBatch);
+    alert("Batch " + id + " Created");
+    this._mdlCtrl.dismiss();
   }
 }

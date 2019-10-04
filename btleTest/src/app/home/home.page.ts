@@ -1,10 +1,8 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Platform, ModalController } from "@ionic/angular";
 import { BluetoothLE } from "@ionic-native/bluetooth-le/ngx";
-import { CheckboxControlValueAccessor } from "@angular/forms";
 import { RfidTag } from "../models/rfidTag";
 import { BtleServiceService } from "./btle-service.service";
-import { nextTick } from "q";
 import { CreateBatchComponent } from "./create-batch/create-batch.component";
 
 @Component({
@@ -12,7 +10,7 @@ import { CreateBatchComponent } from "./create-batch/create-batch.component";
   templateUrl: "home.page.html",
   styleUrls: ["home.page.scss"]
 })
-export class HomePage {
+export class HomePage implements OnInit {
   // get scanned data array from service
   rfidTags = this._btleSerivce.getTags();
   batchTags = this._btleSerivce.getBatch();
@@ -22,7 +20,9 @@ export class HomePage {
     public plt: Platform,
     private _btleSerivce: BtleServiceService,
     private _modalCtrl: ModalController
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.plt.ready().then(readySource => {
       console.log("Platform ready from", readySource);
 
