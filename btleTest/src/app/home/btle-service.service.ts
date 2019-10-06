@@ -7,29 +7,21 @@ import { ModalController } from "@ionic/angular";
   providedIn: "root"
 })
 export class BtleServiceService {
-  public rfidTag: RfidTag = {
-    countryCode: 0,
-    nationalCode: 0
-  };
+  rfidTag: RfidTag = new RfidTag(null, null);
+  rfidTags: RfidTag[];
+  scannedTags: BatchTags = new BatchTags(null, null, null, null, null);
 
-  rfidTags: RfidTag[] = [];
-
-  public scannedTags: BatchTags = {
-    id: 0,
-    // tags: this.rfidTags,
-    //date: null,
-    location: "",
-    description: ""
-  };
+  // public tagsObservable = new Subject<BatchTags>();
 
   constructor(private _mdlCtrl: ModalController) {}
 
   addRfidTag(tag: RfidTag) {
-    this.rfidTags.push(tag);
+    console.log("to be pushed:" + tag);
+    this.scannedTags.tags.push(tag);
   }
 
   getTags() {
-    return this.rfidTags;
+    return this.scannedTags;
   }
 
   getBatch() {
@@ -37,9 +29,19 @@ export class BtleServiceService {
   }
 
   newBatch(id: number, location: string, description: string) {
-    const newBatch = new BatchTags(id, location, description);
+    const newBatch = new BatchTags(
+      id,
+      this.rfidTags,
+      new Date(),
+      location,
+      description
+    );
     console.log(newBatch);
     alert("Batch " + id + " Created");
+    this.scannedTags.id = id;
+    this.scannedTags.description = description;
+    this.scannedTags.location = location;
+
     this._mdlCtrl.dismiss();
   }
 }

@@ -39,7 +39,7 @@ export class CreateBatchComponent implements OnInit {
 
   onCreate() {
     if (!this.form.valid) {
-      console.log("here");
+      console.log("form not valid");
       return;
     }
     this.btleService.newBatch(

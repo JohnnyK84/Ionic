@@ -4,6 +4,7 @@ import { BluetoothLE } from "@ionic-native/bluetooth-le/ngx";
 import { RfidTag } from "../models/rfidTag";
 import { BtleServiceService } from "./btle-service.service";
 import { CreateBatchComponent } from "./create-batch/create-batch.component";
+import { BatchTags } from "../models/batchTags";
 
 @Component({
   selector: "app-home",
@@ -11,9 +12,10 @@ import { CreateBatchComponent } from "./create-batch/create-batch.component";
   styleUrls: ["home.page.scss"]
 })
 export class HomePage implements OnInit {
+  public rfidTag: RfidTag = new RfidTag(null, null);
+  public batch: BatchTags = this._btleSerivce.getTags();
   // get scanned data array from service
-  rfidTags = this._btleSerivce.getTags();
-  batchTags = this._btleSerivce.getBatch();
+  // batchTags = this._btleSerivce.getBatch();
 
   constructor(
     public bluetoothle: BluetoothLE,
@@ -23,6 +25,8 @@ export class HomePage implements OnInit {
   ) {}
 
   ngOnInit() {
+    //this.batch = this._btleSerivce.getTags();
+
     this.plt.ready().then(readySource => {
       console.log("Platform ready from", readySource);
 
@@ -172,11 +176,6 @@ export class HomePage implements OnInit {
 
   // Read payload 1 from SNPShot
   getPayload1() {
-    let rfidTag: RfidTag = {
-      countryCode: 0,
-      nationalCode: 0
-    };
-
     const params = {
       address: "F8:F0:05:E5:D9:9C",
       service: "66021000-43AF-49C1-A7BC-CEF71ABD0AD9",
@@ -197,16 +196,16 @@ export class HomePage implements OnInit {
       const viewCountryCode = new DataView(buff);
       const viewNationalCode = new DataView(buff);
 
-      rfidTag.countryCode = viewCountryCode.getUint16(1, true);
-      rfidTag.nationalCode = viewNationalCode.getUint32(3, true);
+      this.rfidTag.countryCode = viewCountryCode.getUint16(1, true);
+      this.rfidTag.nationalCode = viewNationalCode.getUint32(3, true);
 
-      alert("Country Code is: " + rfidTag.countryCode);
-      alert("National Code is:  " + rfidTag.nationalCode);
+      alert("Country Code is: " + this.rfidTag.countryCode);
+      alert("National Code is:  " + this.rfidTag.nationalCode);
 
-      console.log("RFID Tag Value: " + rfidTag);
+      console.log("RFID Tag Value: " + this.rfidTag);
       // add scanned RFID tag to array
-      this._btleSerivce.addRfidTag(rfidTag);
-      console.log(this.rfidTags);
+      this._btleSerivce.addRfidTag(this.rfidTag);
+      console.log(this.batch);
     });
   }
 

@@ -1,4 +1,3 @@
 export class RfidTag {
-    countryCode: number;
-    nationalCode: number;
+  constructor(public countryCode: number, public nationalCode: number) {}
 }

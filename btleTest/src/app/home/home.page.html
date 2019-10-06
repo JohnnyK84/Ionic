@@ -8,60 +8,64 @@
 
 <ion-content>
   <div class="ion-padding">
-    <h1 class="ion-text-center">Bluetoothle Test</h1> 
-    <hr>
-    <ion-button (click)="connectBtle()" fill="outline" expand="block">Connect SNPShot
+    <h1 class="ion-text-center">Bluetoothle Test</h1>
+    <hr />
+    <ion-button (click)="connectBtle()" fill="outline" expand="block"
+      >Connect SNPShot
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
-    <hr>
-    <ion-button (click)="reconnect()" fill="outline" expand="block">Reconnect to SNPShot
+    <hr />
+    <ion-button (click)="reconnect()" fill="outline" expand="block"
+      >Reconnect to SNPShot
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
-    <hr>
-    <ion-button (click)="discover()" fill="outline" expand="block">Discover services
-      <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>    
-    <hr>
-    <ion-button (click)="scanTag()" fill="outline" expand="block">Scan RFID Tag
+    <hr />
+    <ion-button (click)="discover()" fill="outline" expand="block"
+      >Discover services
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
-    <hr>
-    <ion-button (click)="getPayload1()" fill="outline" expand="block">Get Payload 1
+    <hr />
+    <ion-button (click)="scanTag()" fill="outline" expand="block"
+      >Scan RFID Tag
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
-    <hr>
-    <ion-button (click)="getPayload2()" fill="outline" expand="block">Get Payload 2
+    <hr />
+    <ion-button (click)="getPayload1()" fill="outline" expand="block"
+      >Get Payload 1
+      <ion-icon class="" name="bluetooth"></ion-icon>
+    </ion-button>
+    <hr />
+    <ion-button (click)="getPayload2()" fill="outline" expand="block"
+      >Get Payload 2
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>
 
-    <ion-button (click)="createBatch()">
+    <ion-button color="secondary" (click)="createBatch()">
       Create New Batch
     </ion-button>
 
-
-  
-  <ion-grid> 
-    <h3 class="ion-text-center">Scanned Tags: Batch {{  batchTags.id  }}</h3> 
-    <h3> Batch Location: {{  batchTags.location  }}, Batch Date: {{  batchTags.date  }}</h3>
-    <ion-row>
-      <ion-col>
-        <p>Country Code:</p>
-      </ion-col>
-      <ion-col>
-        <p>National Code:</p>
-      </ion-col>
-    </ion-row>          
-      <ion-row *ngFor="let tag of rfidTags">
+    <ion-grid>
+      <h4>Batch: {{ batch.id }}</h4>
+      <h4>Batch Location: {{ batch.location }}</h4>
+      <p>Description: {{ batch.description }}</p>
+      <ion-row>
         <ion-col>
-          {{  tag.countryCode  }}
+          <p>Country Code:</p>
         </ion-col>
         <ion-col>
-          {{  tag.nationalCode  }}
+          <p>National Code:</p>
         </ion-col>
       </ion-row>
-  </ion-grid>
+      <ion-row *ngFor="let tag of batch.tags">
+        <ion-col>
+          {{ tag.countryCode }}
+        </ion-col>
+        <ion-col>
+          {{ tag.nationalCode }}
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
-    
     <!-- these buttons not being used, for testing purposed only
     <ion-button (click)="scanBtle()" fill="outline" expand="block">Scan for SNPSHOT by sid
       <ion-icon class="" name="bluetooth"></ion-icon>
@@ -84,6 +88,6 @@
     <ion-button (click)="unbond()" fill="outline" expand="block">Unbond
       <ion-icon class="" name="bluetooth"></ion-icon>
     </ion-button>          
-    --> 
+    -->
   </div>
 </ion-content>
