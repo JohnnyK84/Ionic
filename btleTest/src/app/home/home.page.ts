@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { Platform, ModalController } from "@ionic/angular";
 import { BluetoothLE } from "@ionic-native/bluetooth-le/ngx";
 import { RfidTag } from "../models/rfidTag";
@@ -13,9 +13,10 @@ import { BatchTags } from "../models/batchTags";
 })
 export class HomePage implements OnInit {
   public rfidTag: RfidTag = new RfidTag(null, null);
-  public batch: BatchTags = this._btleSerivce.getTags();
+  public batch: BatchTags = this._btleSerivce.getBatch();
   // get scanned data array from service
-  // batchTags = this._btleSerivce.getBatch();
+
+  public btState = this._btleSerivce.getBtStatus();
 
   constructor(
     public bluetoothle: BluetoothLE,
@@ -25,14 +26,13 @@ export class HomePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    //this.batch = this._btleSerivce.getTags();
-
     this.plt.ready().then(readySource => {
       console.log("Platform ready from", readySource);
 
       this.bluetoothle.initialize().subscribe(ble => {
         // if device bluetooth is disabled then enable
         if (ble.status === "disabled") {
+          alert("Bluetooth disabeled, Will attempt to enable");
           this.enableBtle();
         }
         console.log("ble", ble.status); // logs 'enabled'
@@ -40,6 +40,11 @@ export class HomePage implements OnInit {
         this.connectBtle();
       });
     });
+  }
+
+  toggleBtleState() {
+    this._btleSerivce.setBtStatus(!this.btState);
+    this.btState = this._btleSerivce.getBtStatus();
   }
 
   // scan for device by service id
@@ -88,12 +93,12 @@ export class HomePage implements OnInit {
     });
   }
 
-  // enable bluetooth on the device
+  // enable bluetooth on the device -- Android Only
   async enableBtle() {
     this.bluetoothle.enable();
   }
 
-  // disable bluetooth on the device
+  // disable bluetooth on the device -- Android Only
   disableBtle() {
     this.bluetoothle.disable();
   }
@@ -127,6 +132,9 @@ export class HomePage implements OnInit {
 
     this.bluetoothle.reconnect(address).subscribe(result => {
       console.log(result);
+      if (result.status.toString() === "connected") {
+        this.discover();
+      }
     });
   }
 
@@ -134,7 +142,10 @@ export class HomePage implements OnInit {
   discover() {
     const address = { address: "F8:F0:05:E5:D9:9C" };
     this.bluetoothle.discover(address).then(device => {
-      console.log(device);
+      console.log("services discovered..." + device);
+      this._btleSerivce.setBtStatus(true);
+      this.btState = this._btleSerivce.getBtStatus();
+      console.log(this.btState);
     });
   }
 
@@ -162,16 +173,16 @@ export class HomePage implements OnInit {
     }, 3500);
   }
 
-  // write method for writing instructions or data to SNPShot
+  // write method for writing instructions to SNPShot to scan tag
   async writeInstruct(params) {
     const response = await this.bluetoothle.write(params);
     // write instruction to SNPShot device and return response
-    console.log(await response);
+    console.log("Scan response: " + (await response));
     // decode response value to Unit8Array
-    const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(
-      await response.value
-    );
-    console.log(bytes2);
+    // const bytes2: Uint8Array = this.bluetoothle.encodedStringToBytes(
+    //   await response.value
+    // );
+    // console.log(bytes2);
   }
 
   // Read payload 1 from SNPShot
@@ -183,7 +194,7 @@ export class HomePage implements OnInit {
     };
 
     this.bluetoothle.read(params).then(response => {
-      console.log("Initial Read Response object:\n " + response);
+      // console.log("Initial Read Response object:\n " + response);
       // decode response.value into Unit8Array of bytes
       const stringToBytes: Uint8Array = this.bluetoothle.encodedStringToBytes(
         response.value
@@ -203,8 +214,14 @@ export class HomePage implements OnInit {
       alert("National Code is:  " + this.rfidTag.nationalCode);
 
       console.log("RFID Tag Value: " + this.rfidTag);
+
       // add scanned RFID tag to array
-      this._btleSerivce.addRfidTag(this.rfidTag);
+      this._btleSerivce.addRfidTag({
+        countryCode: this.rfidTag.countryCode,
+        nationalCode: this.rfidTag.nationalCode
+      });
+
+      this.batch = this._btleSerivce.getBatch();
       console.log(this.batch);
     });
   }
@@ -249,6 +266,7 @@ export class HomePage implements OnInit {
     });
   }
 
+  // method to create new batch called when Create New Batch Button pressed
   createBatch() {
     this._modalCtrl
       .create({ component: CreateBatchComponent })
@@ -260,6 +278,7 @@ export class HomePage implements OnInit {
         console.log(resultData.data, resultData.role);
         if (resultData.role === "Confirm") {
           console.log("Batch Created!");
+          this.batch = this._btleSerivce.getBatch();
         }
       });
   }

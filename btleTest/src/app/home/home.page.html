@@ -8,6 +8,23 @@
 
 <ion-content>
   <div class="ion-padding">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="4" class="ion-no-padding">
+          <p>Bluetooth Status:</p>
+        </ion-col>
+        <ion-col size-sm="3">
+          <ion-item color="danger" *ngIf="!btState">
+            <ion-label>Not ready to scan</ion-label>
+            <ion-icon name="thumbs-down"></ion-icon>
+          </ion-item>
+          <ion-item color="success" *ngIf="btState">
+            <ion-label>Ready to scan</ion-label>
+            <ion-icon name="thumbs-up"></ion-icon>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
     <h1 class="ion-text-center">Bluetoothle Test</h1>
     <hr />
     <ion-button (click)="connectBtle()" fill="outline" expand="block"
@@ -44,6 +61,10 @@
       Create New Batch
     </ion-button>
 
+    <ion-button (click)="toggleBtleState()">
+      Change BT State
+    </ion-button>
+    <hr />
     <ion-grid>
       <h4>Batch: {{ batch.id }}</h4>
       <h4>Batch Location: {{ batch.location }}</h4>

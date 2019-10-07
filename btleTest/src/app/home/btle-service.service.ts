@@ -8,24 +8,29 @@ import { ModalController } from "@ionic/angular";
 })
 export class BtleServiceService {
   rfidTag: RfidTag = new RfidTag(null, null);
-  rfidTags: RfidTag[];
+  rfidTags: RfidTag[] = [];
   scannedTags: BatchTags = new BatchTags(null, null, null, null, null);
+
+  public btIsConnected = false;
 
   // public tagsObservable = new Subject<BatchTags>();
 
   constructor(private _mdlCtrl: ModalController) {}
 
-  addRfidTag(tag: RfidTag) {
-    console.log("to be pushed:" + tag);
-    this.scannedTags.tags.push(tag);
-  }
-
   getTags() {
-    return this.scannedTags;
+    return this.scannedTags.tags;
   }
 
   getBatch() {
     return this.scannedTags;
+  }
+
+  getBtStatus() {
+    return this.btIsConnected;
+  }
+
+  setBtStatus(state: boolean) {
+    this.btIsConnected = state;
   }
 
   newBatch(id: number, location: string, description: string) {
@@ -36,12 +41,19 @@ export class BtleServiceService {
       location,
       description
     );
-    console.log(newBatch);
     alert("Batch " + id + " Created");
-    this.scannedTags.id = id;
-    this.scannedTags.description = description;
-    this.scannedTags.location = location;
+    this.scannedTags = newBatch;
+    console.log(this.scannedTags);
 
-    this._mdlCtrl.dismiss();
+    this._mdlCtrl.dismiss(null, "Confirm");
+  }
+
+  // method to add new scanned tag to scannedTags
+  addRfidTag(tag: RfidTag) {
+    console.log("to be pushed:" + tag.countryCode);
+    let copiedArr = [...this.scannedTags.tags];
+    copiedArr.push(tag);
+    console.log("copied Array" + copiedArr);
+    this.scannedTags.tags = copiedArr;
   }
 }
