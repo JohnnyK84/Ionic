@@ -7,31 +7,48 @@
 </ion-header>
 
 <ion-content>
-  <div class="ion-padding">
-    <h1>Bluetooth Classic</h1>
-    <hr>
-    <ion-button (click)="connectBtClassic()" fill="outline" expand="block">Connect Stick Reader
-      <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>
-    <hr>
-    <ion-button (click)="readData()" fill="outline" expand="block">Read Data from stick
-      <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>
-    <hr>
-    <ion-button (click)="scanforDevices()" fill="outline" expand="block">BT Classic Scan
-      <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>
-    <hr>
-    <ion-button (click)="subscribe()" fill="outline" expand="block">Subscribe to Data
-      <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>
-    <hr>
-    <ion-button (click)="readUntil()" fill="outline" expand="block">Read Until
-      <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>
-    <hr>
-    <ion-button (click)="subscribeRaw()" fill="outline" expand="block">SubScribe Raw Data
-      <ion-icon class="" name="bluetooth"></ion-icon>
-    </ion-button>
-  </div>
+  <ion-grid>
+    <div class="ion-padding">
+      <h1>Bluetooth Classic</h1>
+      <hr />
+      <ion-row>
+        <ion-col>
+          <p>Count:</p>
+        </ion-col>
+        <ion-col>
+          <p>{{ scanCount }}</p>
+          <ion-button (click)="clearArray()">Clear Array</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-button (click)="connectBtClassic()" fill="outline" expand="block"
+        >Connect Stick Reader
+        <ion-icon class="" name="bluetooth"></ion-icon>
+      </ion-button>
+      <hr />
+      <ion-button (click)="readData()" fill="outline" expand="block"
+        >Read Data from stick
+        <ion-icon class="" name="bluetooth"></ion-icon>
+      </ion-button>
+      <hr />
+      <ion-button (click)="scanforDevices()" fill="outline" expand="block"
+        >BT Classic Scan
+        <ion-icon class="" name="bluetooth"></ion-icon>
+      </ion-button>
+      <hr />
+      <ion-button (click)="subscribe()" fill="outline" expand="block"
+        >Subscribe to Data
+        <ion-icon class="" name="bluetooth"></ion-icon>
+      </ion-button>
+      <hr />
+      <ion-button (click)="readUntil()" fill="outline" expand="block"
+        >Read Until
+        <ion-icon class="" name="bluetooth"></ion-icon>
+      </ion-button>
+      <hr />
+      <ion-button (click)="subscribeRaw()" fill="outline" expand="block"
+        >SubScribe Raw Data
+        <ion-icon class="" name="bluetooth"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-grid>
 </ion-content>
